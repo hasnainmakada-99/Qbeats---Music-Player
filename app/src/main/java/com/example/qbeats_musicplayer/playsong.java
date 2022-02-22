@@ -27,48 +27,46 @@ public class playsong extends AppCompatActivity {
     SeekBar seekBar;
     MediaPlayer mediaPlayer;
     ArrayList<File> song;
-    Thread updateSeekbar;
     int position;
     int totalDuration;
     int startDurationTime;
     public void onDestroy(){
         super.onDestroy();
         mediaPlayer.stop();
-        updateSeekbar.interrupt();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playsong);
-        song_name=findViewById(R.id.song_name);
-        prev=findViewById(R.id.prev);
-        play=findViewById(R.id.play);
-        next=findViewById(R.id.next);
-        startDuration=findViewById(R.id.startDuration);
-        endDuration=findViewById(R.id.endDuration);
-        seekBar=findViewById(R.id.seekBar);
-        Intent intent=getIntent();
-        Bundle bundle=intent.getExtras();
-        song=(ArrayList) bundle.getParcelableArrayList("getsongs");
-        songname=intent.getStringExtra("currentsongs");
+        song_name = findViewById(R.id.song_name);
+        prev = findViewById(R.id.prev);
+        play = findViewById(R.id.play);
+        next = findViewById(R.id.next);
+        startDuration = findViewById(R.id.startDuration);
+        endDuration = findViewById(R.id.endDuration);
+        seekBar = findViewById(R.id.seekBar);
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        song = (ArrayList) bundle.getParcelableArrayList("getsongs");
+        songname = intent.getStringExtra("currentsongs");
         song_name.setText(songname);
         song_name.setSelected(true);
-        position=intent.getIntExtra("position", 0);
-        Uri uri= Uri.parse(song.get(position).toString());
-        mediaPlayer=MediaPlayer.create(getApplicationContext(), uri);
+        position = intent.getIntExtra("position", 0);
+        Uri uri = Uri.parse(song.get(position).toString());
+        mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
         mediaPlayer.start();
         play.setImageResource(R.drawable.pause_foreground);
         seekBar.setMax(mediaPlayer.getDuration());
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
+                //    mediaPlayer.seekTo(seekBar.getProgress());
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                //  mediaPlayer.seekTo(seekBar.getProgress());
             }
 
             @Override
@@ -78,60 +76,80 @@ public class playsong extends AppCompatActivity {
         });
 
 
-
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (mediaPlayer!=null){
+                while (mediaPlayer != null) {
                     try {
-                        if(mediaPlayer.isPlaying()) {
-                        Message msg=new Message();
-                        msg.what=mediaPlayer.getCurrentPosition();
-                        handler.sendMessage(msg);
-                        Thread.sleep(1000);
+                        if (mediaPlayer.isPlaying()) {
+                            Message msg = new Message();
+                            msg.what = mediaPlayer.getCurrentPosition();
+                            handler.sendMessage(msg);
+                            Thread.sleep(1000);
                         }
-                        }
-                        catch(Exception e){
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }
-        }).start();
-
-        updateSeekbar=new Thread(){
-            @Override
-            public void run() {
-                int currentPosition=0;
-                try{
-                    while(currentPosition<mediaPlayer.getDuration()){
-                        currentPosition=mediaPlayer.getCurrentPosition();
-                        seekBar.setProgress(currentPosition);
-                        sleep(200);
-                    }
-                }
-                catch (Exception e){
-                    e.printStackTrace();
                 }
             }
-        };
+        }).start();
 
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
-                String totalTime=createTimeLabel(mediaPlayer.getDuration());
+                String totalTime = createTimeLabel(mediaPlayer.getDuration());
                 endDuration.setText(totalTime);
-                updateSeekbar.start();
+                seekBar.setMax(mediaPlayer.getDuration());
+                mediaPlayer.start();
             }
         });
+
+
+//        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//            @Override
+//            public void onCompletion(MediaPlayer mediaPlayer) {
+//                mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                    @Override
+//                    public void onPrepared(MediaPlayer mediaPlayer) {
+//                        String totalTime = createTimeLabel(mediaPlayer.getDuration());
+//                        endDuration.setText(totalTime);
+//                        seekBar.setMax(mediaPlayer.getDuration());
+//                        mediaPlayer.start();
+//                    }
+//                });
+//            }
+//        });
+//        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//            @Override
+//            public void onCompletion(MediaPlayer mediaPlayer) {
+//                if(mediaPlayer!=null && mediaPlayer.isPlaying() && position<song.size()-1){
+//                    mediaPlayer.reset();
+//                    position=position+1;
+//                }
+//                String sname = song.get(position).getName();
+//                song_name.setText(sname);
+//                Uri uri=Uri.parse(song.get(position).toString());
+//                mediaPlayer=MediaPlayer.create(playsong.this, uri);
+//                mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                    @Override
+//                    public void onPrepared(MediaPlayer mediaPlayer) {
+//                        String totalTime = createTimeLabel(mediaPlayer.getDuration());
+//                        endDuration.setText(totalTime);
+//                        seekBar.setMax(mediaPlayer.getDuration());
+//                        mediaPlayer.start();
+//                        play.setImageResource(R.drawable.pause_foreground);
+//                    }
+//                });
+//            }
+//        });
 
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mediaPlayer.isPlaying()){
+                if (mediaPlayer.isPlaying()) {
                     mediaPlayer.pause();
                     play.setImageResource(R.drawable.play_foreground);
-                }
-                else{
+                } else {
                     play.setImageResource(R.drawable.pause_foreground);
                     mediaPlayer.start();
                 }
@@ -143,19 +161,20 @@ public class playsong extends AppCompatActivity {
             public void onClick(View view) {
                 mediaPlayer.stop();
                 mediaPlayer.release();
-                if(position!=0){
-                    position=position-1;
+                if (position != 0) {
+                    position = position - 1;
+                } else {
+                    position = song.size() - 1;
                 }
-                else{
-                    position=song.size()-1;
-                    seekBar.setProgress(mediaPlayer.getCurrentPosition());
-                }
-                Uri uri=Uri.parse(song.get(position).toString());
-                mediaPlayer=MediaPlayer.create(playsong.this, uri);
+                Uri uri = Uri.parse(song.get(position).toString());
+                mediaPlayer = MediaPlayer.create(playsong.this, uri);
                 mediaPlayer.start();
+                String totalTime = createTimeLabel(mediaPlayer.getDuration());
+                endDuration.setText(totalTime);
                 play.setImageResource(R.drawable.pause_foreground);
-                songname=song.get(position).getName();
+                songname = song.get(position).getName();
                 song_name.setText(songname);
+
             }
         });
 
@@ -164,22 +183,25 @@ public class playsong extends AppCompatActivity {
             public void onClick(View view) {
                 mediaPlayer.stop();
                 mediaPlayer.release();
-                if(position<song.size()-1){
-                    position=position+1;
+                if (position < song.size() - 1) {
+                    position = position + 1;
+                } else {
+                    position = 0;
                 }
-                else{
-                    position=0;
-                }
-                Uri uri=Uri.parse(song.get(position).toString());
-                mediaPlayer=MediaPlayer.create(playsong.this, uri);
-                seekBar.setProgress(mediaPlayer.getCurrentPosition());
+                Uri uri = Uri.parse(song.get(position).toString());
+                mediaPlayer = MediaPlayer.create(playsong.this, uri);
                 mediaPlayer.start();
+                String totalTime = createTimeLabel(mediaPlayer.getDuration());
+                endDuration.setText(totalTime);
                 play.setImageResource(R.drawable.pause_foreground);
-                songname=song.get(position).getName();
+                songname = song.get(position).getName();
                 song_name.setText(songname);
 
             }
         });
+
+
+
     }
 
     @SuppressLint("HandlerLeak")
@@ -187,6 +209,7 @@ public class playsong extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
                 int Current=msg.what;
+                seekBar.setProgress(Current);
                 String ctim=createTimeLabel(Current);
                 startDuration.setText(ctim);
         }
@@ -199,7 +222,6 @@ public class playsong extends AppCompatActivity {
         timeLabel += min + ":";
         if (sec < 10) timeLabel += "0";
         timeLabel += sec;
-
         return timeLabel;
     }
 }

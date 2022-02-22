@@ -3,9 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/QbeatsMusicPlayer/app/src/main/res/drawable/next_foreground.xml" value="0.158" />
         <entry key="..\:/QbeatsMusicPlayer/app/src/main/res/drawable/play_foreground.xml" value="0.2075" />
         <entry key="..\:/QbeatsMusicPlayer/app/src/main/res/layout/activity_main.xml" value="0.18072916666666666" />
-        <entry key="..\:/QbeatsMusicPlayer/app/src/main/res/layout/activity_playsong.xml" value="0.176" />
+        <entry key="..\:/QbeatsMusicPlayer/app/src/main/res/layout/activity_playsong.xml" value="0.4" />
+        <entry key="..\:/QbeatsMusicPlayer/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.158" />
+        <entry key="..\:/QbeatsMusicPlayer/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.158" />
+        <entry key="..\:/QbeatsMusicPlayer/app/src/main/res/mipmap-anydpi-v26/pause_round.xml" value="0.158" />
       </map>
     </option>
   </component>
